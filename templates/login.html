@@ -1,1 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Login · {{ site_name }}{% endblock %}
 
+{% block content %}
+<section class="auth panel">
+    <p class="eyebrow">WELCOME BACK</p>
+    <h1>Log in to Sankha Web</h1>
+    <p class="muted">Continue connecting with the community.</p>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label for="username">Username</label>
+        <input id="username" name="username"
+               autocomplete="username"
+               placeholder="Enter your username" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password"
+               autocomplete="current-password"
+               placeholder="Enter your password" required>
+
+        <button class="primary full" type="submit">Log In</button>
+    </form>
+
+    <p class="muted">
+        Don't have an account?
+        <a href="{{ url_for('register') }}">Create one</a>
+    </p>
+</section>
+{% endblock %}

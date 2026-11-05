@@ -1,1 +1,114 @@
 
+{% extends "base.html" %}
+{% block title %}Home · {{ site_name }}{% endblock %}
+
+{% block content %}
+
+<section class="panel">
+    <p class="eyebrow">WELCOME TO THE COMMUNITY</p>
+    <h1>What's happening?</h1>
+    <p class="muted">Share your thoughts and moments with everyone.</p>
+</section>
+
+{% if current_user.is_authenticated %}
+<section class="panel">
+    <h2>Create a public post</h2>
+
+    <form method="POST" action="{{ url_for('create_post') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <textarea name="body" maxlength="1000" placeholder="Write something for everyone..."></textarea>
+
+        <label for="image">Upload a photo</label>
+        <input id="image" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+
+        <button class="primary full" type="submit">Publish post</button>
+    </form>
+</section>
+{% else %}
+<section class="panel">
+    <h2>Join the conversation!</h2>
+    <p class="muted">Log in to publish messages, upload photos and interact with others.</p>
+    <a class="primary" href="{{ url_for('login') }}">Log in</a>
+    <a href="{{ url_for('register') }}">Create account</a>
+</section>
+{% endif %}
+
+<section class="feed">
+    <h2>Community Feed</h2>
+
+    {% for post in posts %}
+    <article class="panel post">
+
+        <div class="post-head">
+            <div class="avatar">{{ post.author.username[:1]|upper }}</div>
+            <div>
+                <a class="username" href="{{ url_for('profile', username=post.author.username) }}">
+                    @{{ post.author.username }}
+                </a>
+                <div class="muted small">
+                    {{ post.created_at.strftime('%d %b %Y · %H:%M') }} UTC
+                </div>
+            </div>
+        </div>
+
+        {% if post.body %}
+        <p class="post-body">{{ post.body }}</p>
+        {% endif %}
+
+        {% if post.image %}
+        <img class="post-image"
+             src="{{ url_for('static', filename='uploads/' ~ post.image) }}"
+             alt="Community post image">
+        {% endif %}
+
+        <div class="post-actions">
+            {% if current_user.is_authenticated %}
+            <form method="POST" action="{{ url_for('toggle_like', post_id=post.id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="secondary" type="submit">
+                    {{ '♥ Liked' if liked_by_me(post) else '♡ Like' }}
+                </button>
+            </form>
+            {% endif %}
+
+            <span class="muted">{{ like_count(post) }} likes</span>
+        </div>
+
+        <div class="comments">
+            <h3>Comments ({{ post.comments|length }})</h3>
+
+            {% for comment in post.comments %}
+            <p>
+                <strong>@{{ comment.author.username }}</strong>
+                {{ comment.body }}
+            </p>
+            {% endfor %}
+
+            {% if current_user.is_authenticated %}
+            <form method="POST" action="{{ url_for('add_comment', post_id=post.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input name="body" maxlength="500" placeholder="Write a comment..." required>
+                <button class="secondary" type="submit">Comment</button>
+            </form>
+            {% endif %}
+        </div>
+
+        {% if current_user.is_authenticated and current_user.id == post.user_id %}
+        <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="secondary" type="submit">Delete post</button>
+        </form>
+        {% endif %}
+
+    </article>
+    {% else %}
+    <div class="panel empty">
+        <h3>No posts yet!</h3>
+        <p class="muted">Be the first to share something with the community.</p>
+    </div>
+    {% endfor %}
+</section>
+
+{% endblock %}
+

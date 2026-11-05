@@ -1,1 +1,39 @@
 
+{% extends "base.html" %}
+{% block title %}Create Account · {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="auth panel">
+    <p class="eyebrow">JOIN THE COMMUNITY</p>
+    <h1>Create your account</h1>
+    <p class="muted">Become part of Sankha Web 2.0.</p>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label for="username">Username</label>
+        <input id="username" name="username"
+               minlength="3" maxlength="24"
+               autocomplete="username"
+               placeholder="Choose a username" required>
+
+        <label for="email">Email address</label>
+        <input id="email" type="email" name="email"
+               maxlength="254" autocomplete="email"
+               placeholder="Your email address" required>
+
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password"
+               minlength="10" autocomplete="new-password"
+               placeholder="At least 10 characters" required>
+
+        <button class="primary full" type="submit">Create Account</button>
+    </form>
+
+    <p class="muted">
+        Already registered?
+        <a href="{{ url_for('login') }}">Log in</a>
+    </p>
+</section>
+{% endblock %}
+

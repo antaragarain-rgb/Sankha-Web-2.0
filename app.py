@@ -3,6 +3,7 @@ import os
 import secrets
 from datetime import datetime, timezone
 from pathlib import Path
+from sqlalchemy import and_, or_
 
 from flask import (
     Flask, render_template, redirect, url_for, request,
@@ -339,12 +340,12 @@ def private_messages(username):
         return redirect(url_for("private_messages", username=username))
 
     conversation = Message.query.filter(
-        db.or_(
-            db.and_(
+        or_( 
+            and_(
                 Message.sender_id == current_user.id,
                 Message.receiver_id == other.id,
             ),
-            db.and_(
+            and_(
                 Message.sender_id == other.id,
                 Message.receiver_id == current_user.id,
             ),

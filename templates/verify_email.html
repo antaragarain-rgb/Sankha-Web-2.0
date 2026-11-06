@@ -1,1 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Verify Email · {{ site_name }}{% endblock %}
 
+{% block content %}
+<section class="auth panel">
+    <p class="eyebrow">ACCOUNT VERIFICATION</p>
+    <h1>Verify your email</h1>
+
+    <p class="muted">
+        Please check your email for a verification link to activate your account.
+    </p>
+
+    <p class="muted">
+        Didn't receive the email? You can request another verification link.
+    </p>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="primary full" type="submit">
+            Resend Verification Email
+        </button>
+    </form>
+</section>
+{% endblock %}

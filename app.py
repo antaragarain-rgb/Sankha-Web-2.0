@@ -116,12 +116,17 @@ def inject_globals():
         if not current_user.is_authenticated:
             return False
         return Like.query.filter_by(
-            user_id=current_user.id, post_id=post.id
+            user_id=current_user.id,
+            post_id=post.id
         ).first() is not None
+
+    def like_count(post):
+        return Like.query.filter_by(post_id=post.id).count()
 
     return {
         "site_name": "Sankha Web 2.0",
         "liked_by_me": liked_by_me,
+        "like_count": like_count,
     }
 
 

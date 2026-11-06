@@ -1,1 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Chat with @{{ other_user.username }} · {{ site_name }}{% endblock %}
 
+{% block content %}
+<section class="panel">
+    <p class="eyebrow">PRIVATE CONVERSATION</p>
+    <h1>
+        <a class="username"
+           href="{{ url_for('profile', username=other_user.username) }}">
+            @{{ other_user.username }}
+        </a>
+    </h1>
+    <p class="muted">Messages are visible only to the conversation participants.</p>
+</section>
+
+<section class="panel chat-box">
+    {% for message in messages %}
+    <div class="message {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+        <strong>
+            @{{ message.sender.username }}
+        </strong>
+
+        <p>{{ message.body }}</p>
+
+        <span class="muted small">
+            {{ message.created_at.strftime('%d %b %Y · %H:%M') }} UTC
+        </span>
+    </div>
+    {% else %}
+    <p class="muted empty">No messages yet. Start the conversation!</p>
+    {% endfor %}
+</section>
+
+<section class="panel">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <textarea name="body"
+                  maxlength="2000"
+                  placeholder="Write a private message..."
+                  required></textarea>
+
+        <button class="primary full" type="submit">
+            Send Message
+        </button>
+    </form>
+</section>
+{% endblock %}

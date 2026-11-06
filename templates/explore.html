@@ -1,1 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Explore · {{ site_name }}{% endblock %}
 
+{% block content %}
+<section class="panel">
+    <p class="eyebrow">DISCOVER PEOPLE</p>
+    <h1>Explore Community</h1>
+    <p class="muted">Find people and connect with other members.</p>
+</section>
+
+<section class="user-grid">
+    {% for user in users %}
+    <article class="panel user-card">
+        <div class="avatar">
+            {{ user.username[:1]|upper }}
+        </div>
+
+        <h3>
+            <a class="username"
+               href="{{ url_for('profile', username=user.username) }}">
+                @{{ user.username }}
+            </a>
+        </h3>
+
+        <p class="muted">
+            {{ user.bio or "No bio added yet." }}
+        </p>
+
+        {% if current_user.is_authenticated and current_user.id != user.id %}
+            <a class="primary"
+               href="{{ url_for('private_messages', username=user.username) }}">
+                Message
+            </a>
+        {% endif %}
+    </article>
+    {% else %}
+    <div class="panel empty">
+        <p>No members to explore yet.</p>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

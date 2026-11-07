@@ -95,7 +95,22 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 
 def utcnow():
     return datetime.now(timezone.utc)
+def generate_email_token(user):
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    return serializer.dumps(user.id, salt="email-verify")
 
+
+def verify_email_token(token, max_age=86400):
+    serializer = URLSafeTimedSerializer(app.config["SECRET_KEY"])
+    try:
+        user_id = serializer.loads(
+            token,
+            salt="email-verify",
+            max_age=max_age
+        )
+        return db.session.get(User, int(user_id))
+    except (BadSignature, SignatureExpired, ValueError, TypeError):
+        return None
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -45,6 +45,43 @@ app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = True
+def send_brevo_email(to_email, subject, html_content):
+    api_key = os.environ.get("BREVO_API_KEY")
+    sender_email = os.environ.get("BREVO_SENDER_EMAIL")
+
+    if not api_key or not sender_email:
+        print("Brevo email configuration is missing.")
+        return False
+
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json"
+    }
+
+    payload = {
+        "sender": {
+            "name": "Sankha Web 2.0",
+            "email": sender_email
+        },
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html_content
+    }
+
+    try:
+        response = requests.post(
+            "https://api.brevo.com/v3/smtp/email",
+            headers=headers,
+            json=payload,
+            timeout=15
+        )
+        response.raise_for_status()
+        return True
+
+    except requests.RequestException as error:
+        print("Brevo email failed:", type(error).__name__)
+        return False
 
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)

@@ -229,6 +229,24 @@ def register():
 
     return render_template("register.html")
 
+@app.route("/verify-email/<token>")
+def verify_email(token):
+    user = verify_email_token(token)
+
+    if not user:
+        flash("This verification link is invalid or has expired.", "error")
+        return redirect(url_for("login"))
+
+    if user.email_verified:
+        flash("Your email is already verified. Please log in.", "success")
+        return redirect(url_for("login"))
+
+    user.email_verified = True
+    db.session.commit()
+
+    flash("Email verified successfully! You can now log in.", "success")
+    return redirect(url_for("login"))
+    
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:

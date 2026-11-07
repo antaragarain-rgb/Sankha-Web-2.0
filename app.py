@@ -229,7 +229,6 @@ def register():
 
     return render_template("register.html")
 
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
@@ -241,6 +240,10 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password_hash, password):
+            if not user.email_verified:
+                flash("Please verify your email before logging in.", "error")
+                return render_template("login.html")
+
             login_user(user)
             return redirect(url_for("index"))
 
